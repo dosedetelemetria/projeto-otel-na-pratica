@@ -1,15 +1,15 @@
-# Descrição
+### Descrição
 
 <!-- Explique o que foi alterado e o motivo -->
 
-## Tipo de Mudança
+### Tipo de Mudança
 
 - [ ] Bugfix
 - [ ] Nova funcionalidade
 - [ ] Melhoria na documentação
 - [ ] Refatoração de código
 
-## Checklist
+### Checklist
 
 - [ ] O código segue os padrões do projeto.
 - [ ] Adicionei testes para garantir a funcionalidade.
