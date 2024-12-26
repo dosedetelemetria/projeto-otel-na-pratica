@@ -116,3 +116,27 @@ Os seguintes volumes são utilizados para armazenar dados de forma persistente:
 
 Com esta configuração, você terá uma stack de observabilidade completa para monitorar sistemas em desenvolvimento.
 
+## Instalação e Uso do Kind (Kubernetes in Docker)
+
+Para configurar um cluster Kubernetes local usando o Kind (Kubernetes in Docker), siga as instruções abaixo:
+
+### Instalar o Kind
+1. Certifique-se de ter o Docker instalado e em execução.
+2. Baixe e instale o Kind executando o seguinte comando:
+   ```bash
+   curl -Lo ./kind https://kind.sigs.k8s.io/dl/latest/kind-linux-amd64
+   chmod +x ./kind
+   sudo mv ./kind /usr/local/bin/kind
+   ```
+
+### Criar um Cluster com o Kind
+1. Certifique-se de que o arquivo `kind.yaml` está no diretório que será chamado
+2. Execute o comando para criar um cluster Kubernetes com múltiplos nós:
+   ```bash
+   kind create cluster --name=multi-node-cluster --config=kind.yaml
+   ```
+3. Verifique se o cluster foi criado com sucesso:
+   ```bash
+   kubectl get nodes
+   ```
+
