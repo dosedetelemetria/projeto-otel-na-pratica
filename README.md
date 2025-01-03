@@ -4,6 +4,18 @@ Este é o projeto que utilizamos na Especialização em OpenTelemetry no [Dose d
 
 A aplicação não possui nenhuma instrumentação. Nada. Durante a especialização, vamos utilizar a aplicação para aprender diversos aspectos de observabilidade, com foco em OTel.
 
+---
+
+## **Sumário**
+
+- [Módulos Disponíveis](#módulos-disponíveis)
+- [Configuração](#configuração)
+- [Como as coisas funcionam](#como-as-coisas-funcionam)
+- [Contribuindo](#contribuindo)
+- [Licença](#licença)
+
+---
+
 ## Módulos Disponíveis
 
 - **`cmd/users`**:
@@ -20,6 +32,8 @@ A aplicação não possui nenhuma instrumentação. Nada. Durante a especializa�
 
 - **`cmd/subscriptions`**:
   - **Descrição**: Este módulo gerencia as assinaturas dos usuários aos planos. Ele lida com a criação, atualização e cancelamento de assinaturas.
+
+---
 
 ## Configuração
 
@@ -51,9 +65,19 @@ server:
     http: :8080
 ```
 
+---
+
 ## Como as coisas funcionam
 
 * Os serviços "plans" e "users" não tem dependências com outros serviços. O serviço "subscriptions" precisa fazer conexões com "plans" e "users", enquanto que "payments" faz uma conexão com "subscriptions".
+
+---
+
+## Contribuindo
+
+Quer ajudar a melhorar este projeto? Veja como começar no arquivo [CONTRIBUTING.md](CONTRIBUTING.md). O guia explica como criar Issues, enviar Pull Requests e seguir as melhores práticas para contribuir de forma eficiente.
+
+---
 
 ## Licença
 
