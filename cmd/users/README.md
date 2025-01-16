@@ -1,10 +1,27 @@
 # Pacote `cmd/users`
 
-A ser documentado.
+Módulo para gerenciar usuários.
 
-Mas por enquanto, aqui vão alguns exemplos: 
+### Listar usuários
+
+Para listar todos os usuários, utilize o seguinte comando:
 
 ```terminal
-$ curl localhost:8081/users
-$ curl -X POST localhost:8081/users -d '{"id": "jpkroehling", "name":"Juraci Paixão Kröhling", "email":"juraci@example.com"}'
+$ curl -X GET localhost:8080/users
+```
+
+### Criar um novo usuário
+
+Para criar um novo usuário, utilize o seguinte comando:
+
+```terminal
+$ curl -X POST localhost:8080/users -d '{"id": "jpkroehling", "name":"Juraci Paixão Kröhling", "email":"juraci@example.com"}'
+```
+
+## Inicialização
+
+Para iniciar a aplicação, execute o comando abaixo:
+
+```terminal
+$ go run ./cmd/users/
 ```
