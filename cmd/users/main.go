@@ -9,15 +9,13 @@ import (
 
 	"github.com/dosedetelemetria/projeto-otel-na-pratica/internal/app"
 	"github.com/dosedetelemetria/projeto-otel-na-pratica/internal/config"
-	"go.uber.org/zap"
+	"github.com/dosedetelemetria/projeto-otel-na-pratica/internal/pkg/telemetry"
 )
 
 func main() {
 	// Cria um logger de desenvolvimento
-	logger, err := zap.NewDevelopment()
-	if err != nil {
-		panic("failed to initialize logger")
-	}
+	telemetry.InitLogger(false)
+	logger := telemetry.GetLogger()
 	defer logger.Sync()
 
 	logger.Info("Starting the application...")
@@ -27,13 +25,13 @@ func main() {
 	flag.Parse()
 
 	if *configFlag == "" {
-		logger.Warn("Config file not provided. Using default values.", zap.String("flag", "config"))
+		logger.Warn("Config file not provided. Using default values.")
 	}
 
-	logger.Info("Loading the config file", zap.String("file", *configFlag))
+	logger.Info("Loading the config file")
 	c, err := config.LoadConfig(*configFlag)
 	if err != nil {
-		logger.Fatal("Error loading the config file", zap.String("file", *configFlag), zap.Error(err))
+		logger.Fatal("Error loading the config file" + err.Error())
 	}
 
 	// Criação da aplicação
@@ -45,9 +43,9 @@ func main() {
 	a.RegisterRoutes(http.DefaultServeMux)
 
 	// Inicialização do servidor
-	logger.Info("Starting HTTP server...", zap.String("endpoint", c.Server.Endpoint.HTTP))
+	logger.Info("Starting HTTP server..." + c.Server.Endpoint.HTTP)
 	err = http.ListenAndServe(c.Server.Endpoint.HTTP, http.DefaultServeMux)
 	if err != nil {
-		logger.Fatal("Error starting the server", zap.String("endpoint", c.Server.Endpoint.HTTP), zap.Error(err))
+		logger.Fatal("Error starting the server" + err.Error())
 	}
 }
