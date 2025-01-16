@@ -2,11 +2,6 @@
 
 CONFIG_PATH ?= ./local/config.yaml
 
-PLANS_ENDPOINT ?= `yq .subscriptions.plans_endpoint $(CONFIG_PATH)`
-USERS_ENDPOINT ?= `yq .subscriptions.users_endpoint $(CONFIG_PATH)`
-SUBSCRIPTIONS_ENDPOINT ?= `yq .payments.subscriptions_endpoint $(CONFIG_PATH)`
-PAYMENTS_ENDPOINT ?= `yq .server.endpoint.http $(CONFIG_PATH)`
-
 CMD_NATS_SERVER_START_BIN := nats-server -a 127.0.0.1 -js &
 CMD_NATS_SERVER_STOP_BIN := killall nats-server
 
