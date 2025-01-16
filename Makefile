@@ -1,5 +1,14 @@
 .DEFAULT_GOAL := help
 
+CONFIG_PATH ?= ./local/config.yaml
+
+CMD_NATS_SERVER_START_BIN := nats-server -a 127.0.0.1 -js &
+CMD_NATS_SERVER_STOP_BIN := killall nats-server
+
+CMD_CREATE_PAYMENT_STREAM := nats stream create payments --subjects "payment.process" --storage memory --replicas 1 --retention=limits --discard=old --max-msgs 1_000_000 --max-msgs-per-subject 100_000 --max-bytes 4GiB --max-age 1d --max-msg-size 10MiB --dupe-window 2m --allow-rollup --no-deny-delete --no-deny-purge
+
+CMD_ALL_IN_ONE_START := go run ./cmd/all-in-one/ -config $(CONFIG_PATH)
+
 .PHONY: help
 help:
 	@echo Para construir o projeto, execute:
@@ -41,6 +50,28 @@ build-subscriptions:
 .PHONY: build-plans
 build-plans:
 	@goreleaser build -f=.goreleaser.yaml --snapshot --clean --single-target --id plans
+
+.PHONY: start
+start: start-bin
+
+.PHONY: start-bin
+start-bin:
+	@echo ;
+	@echo Starting 'nats-server '
+	$(CMD_NATS_SERVER_START_BIN)
+	@echo ;
+	@echo Creating Payment Stream
+	$(CMD_CREATE_PAYMENT_STREAM)
+	@echo ;
+	@echo 'Run project (all in one)'
+	$(CMD_ALL_IN_ONE_START)
+
+.PHONY: stop
+stop:
+	@echo Stop nats-server
+	$(CMD_NATS_SERVER_STOP_BIN)
+	@echo ;
+
 
 .PHONY: install-tools
 install-tools:
