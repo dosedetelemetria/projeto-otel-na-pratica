@@ -73,6 +73,22 @@ server:
 
 ---
 
+## Instalação das ferramentas
+
+### NATS
+
+Instalação do `nats-server` e `nats`
+
+#### macOS via Homebrew
+```
+## nats-server
+brew install nats-server
+
+## NATS Command Line Interface
+brew tap nats-io/nats-tools
+brew install nats-io/nats-tools/nats
+```
+
 ## Contribuindo
 
 Quer ajudar a melhorar este projeto? Veja como começar no arquivo [CONTRIBUTING.md](CONTRIBUTING.md). O guia explica como criar Issues, enviar Pull Requests e seguir as melhores práticas para contribuir de forma eficiente.
