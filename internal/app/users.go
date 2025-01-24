@@ -4,12 +4,14 @@
 package app
 
 import (
+	"context"
 	"net/http"
 
 	"github.com/dosedetelemetria/projeto-otel-na-pratica/internal/config"
 	userhttp "github.com/dosedetelemetria/projeto-otel-na-pratica/internal/pkg/handler/http"
 	"github.com/dosedetelemetria/projeto-otel-na-pratica/internal/pkg/store"
 	"github.com/dosedetelemetria/projeto-otel-na-pratica/internal/pkg/store/memory"
+	"go.opentelemetry.io/otel"
 )
 
 type User struct {
@@ -17,8 +19,11 @@ type User struct {
 	Store   store.User
 }
 
-func NewUser(*config.Users) *User {
-	store := memory.NewUserStore()
+func NewUser(ctx context.Context, _ *config.Users) *User {
+	ctx, span := otel.Tracer("user").Start(ctx, "NewUser")
+	defer span.End()
+
+	store := memory.NewUserStore(ctx)
 	return &User{
 		Handler: userhttp.NewUserHandler(store),
 		Store:   store,
