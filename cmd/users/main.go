@@ -4,6 +4,7 @@
 package main
 
 import (
+	"context"
 	"flag"
 	"net/http"
 
@@ -17,7 +18,7 @@ func main() {
 
 	c, _ := config.LoadConfig(*configFlag)
 
-	a := app.NewUser(&c.Users)
+	a := app.NewUser(context.Background(), &c.Users)
 	a.RegisterRoutes(http.DefaultServeMux)
 	_ = http.ListenAndServe(c.Server.Endpoint.HTTP, http.DefaultServeMux)
 }
