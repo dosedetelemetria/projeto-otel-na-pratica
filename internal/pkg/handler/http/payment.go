@@ -54,12 +54,16 @@ func (h *PaymentHandler) Create(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Check if subscription exists
-	sub, _ := http.Get(h.subscriptionsEndpoint + "/" + payment.SubscriptionID)
+	sub, err := http.Get(h.subscriptionsEndpoint + "/" + payment.SubscriptionID)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer sub.Body.Close()
 	if sub.StatusCode != http.StatusOK {
 		http.Error(w, "Subscription not found", http.StatusBadRequest)
 		return
 	}
-	defer sub.Body.Close()
 
 	payload, err := json.Marshal(payment)
 	if err != nil {
