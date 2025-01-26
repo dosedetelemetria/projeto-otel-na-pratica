@@ -18,11 +18,6 @@ tracer_provider:
     - batch:
         exporter:
           otlp:
-            protocol: http/protobuf
-            endpoint: http://${NODE_IP}:4318
-    - batch:
-        exporter:
-          otlp:
             protocol: grpc
             endpoint: http://localhost:4317
 
