@@ -13,6 +13,8 @@ import (
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/codes"
 )
 
 // PaymentHandler is an HTTP handler that performs CRUD operations for model.Payment using a store.Payment
@@ -72,9 +74,16 @@ func (h *PaymentHandler) Create(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	hs := nats.Header{
+		"tenant": []string{"dose"},
+	}
+
+	otel.GetTextMapPropagator().Inject(r.Context(), carrier{hs})
+
 	_, err = h.js.PublishMsgAsync(&nats.Msg{
 		Subject: h.jsSubject,
 		Data:    payload,
+		Header:  hs,
 	})
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
@@ -139,16 +148,41 @@ func (h *PaymentHandler) Delete(w http.ResponseWriter, r *http.Request) {
 }
 
 func (h *PaymentHandler) OnMessage(msg jetstream.Msg) {
+	ctx := otel.GetTextMapPropagator().Extract(context.Background(), carrier{msg.Headers()})
+	ctx, span := otel.Tracer("payments").Start(ctx, "onMessage")
+	defer span.End()
+
 	payment := &model.Payment{}
 	err := json.Unmarshal(msg.Data(), payment)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return
 	}
 
-	_, err = h.store.Create(context.Background(), payment)
+	_, err = h.store.Create(ctx, payment)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return
 	}
 
-	_ = msg.Ack()
+	err = msg.Ack()
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return
+	}
+}
+
+type carrier struct {
+	nats.Header
+}
+
+func (c carrier) Keys() []string {
+	keys := make([]string, 0, len(c.Header))
+	for k := range c.Header {
+		keys = append(keys, k)
+	}
+	return keys
 }
