@@ -12,9 +12,13 @@ import (
 	"github.com/dosedetelemetria/projeto-otel-na-pratica/internal/pkg/model"
 	"github.com/dosedetelemetria/projeto-otel-na-pratica/internal/pkg/store"
 	storegorm "github.com/dosedetelemetria/projeto-otel-na-pratica/internal/pkg/store/gorm"
+	"github.com/dosedetelemetria/projeto-otel-na-pratica/internal/telemetry"
 	"github.com/nats-io/nats.go"
 	"github.com/nats-io/nats.go/jetstream"
 	"go.opentelemetry.io/contrib/instrumentation/net/http/otelhttp"
+	"go.opentelemetry.io/otel/attribute"
+	"go.opentelemetry.io/otel/codes"
+	"go.opentelemetry.io/otel/trace"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
@@ -27,25 +31,47 @@ type Payment struct {
 }
 
 func NewPayment(cfg *config.Payments) (*Payment, error) {
-	ctx := context.Background()
+	ctx, span := telemetry.Tracer().Start(context.Background(), "NewPayment",
+		trace.WithSpanKind(trace.SpanKindServer),
+		trace.WithAttributes(attribute.String("consumer", cfg.NATS.ConsumerName)),
+	)
+	defer span.End()
+
+	span.SetAttributes(attribute.String("consumer", cfg.NATS.ConsumerName))
+
+	span.AddEvent("connecting to database")
 	db, err := gorm.Open(sqlite.Open(cfg.SQLLite.DSN))
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
-	_ = db.AutoMigrate(&model.Payment{})
+
+	err = db.AutoMigrate(&model.Payment{})
+	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
+		return nil, err
+	}
 
 	nc, err := nats.Connect(cfg.NATS.Endpoint)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 
 	js, err := jetstream.New(nc)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 
 	stream, err := js.Stream(ctx, cfg.NATS.Stream)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 
@@ -57,6 +83,8 @@ func NewPayment(cfg *config.Payments) (*Payment, error) {
 		AckPolicy:     jetstream.AckExplicitPolicy,
 	})
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 
@@ -69,9 +97,12 @@ func NewPayment(cfg *config.Payments) (*Payment, error) {
 
 	pmt.cctx, err = cons.Consume(pmt.Handler.OnMessage)
 	if err != nil {
+		span.RecordError(err)
+		span.SetStatus(codes.Error, err.Error())
 		return nil, err
 	}
 
+	span.AddEvent("payment service created")
 	return pmt, nil
 }
 

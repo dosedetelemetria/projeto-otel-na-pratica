@@ -8,7 +8,10 @@ import (
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/log/global"
 	"go.opentelemetry.io/otel/propagation"
+	"go.opentelemetry.io/otel/trace"
 )
+
+const Scope = "projeto-otel-na-pratica"
 
 func Setup(ctx context.Context, confFlag string) (func(context.Context) error, error) {
 	b, err := os.ReadFile(confFlag)
@@ -35,4 +38,8 @@ func Setup(ctx context.Context, confFlag string) (func(context.Context) error, e
 	otel.SetMeterProvider(sdk.MeterProvider())
 	global.SetLoggerProvider(sdk.LoggerProvider())
 	return sdk.Shutdown, nil
+}
+
+func Tracer() trace.Tracer {
+	return otel.Tracer(Scope)
 }
