@@ -1,0 +1,34 @@
+package telemetry
+
+import (
+	"context"
+	"os"
+
+	"go.opentelemetry.io/contrib/otelconf/v0.3.0"
+	"go.opentelemetry.io/otel"
+	"go.opentelemetry.io/otel/log/global"
+)
+
+func Setup(ctx context.Context, confFlag string) (func(context.Context) error, error) {
+	b, err := os.ReadFile(confFlag)
+	if err != nil {
+		return nil, err
+	}
+
+	// interpolate the environment variables
+	b = []byte(os.ExpandEnv(string(b)))
+
+	// parse the config
+	conf, err := otelconf.ParseYAML(b)
+	if err != nil {
+		return nil, err
+	}
+	sdk, err := otelconf.NewSDK(otelconf.WithContext(ctx), otelconf.WithOpenTelemetryConfiguration(*conf))
+	if err != nil {
+		return nil, err
+	}
+	otel.SetTracerProvider(sdk.TracerProvider())
+	otel.SetMeterProvider(sdk.MeterProvider())
+	global.SetLoggerProvider(sdk.LoggerProvider())
+	return sdk.Shutdown, nil
+}
