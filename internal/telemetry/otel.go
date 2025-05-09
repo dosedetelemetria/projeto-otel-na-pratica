@@ -7,6 +7,7 @@ import (
 	"go.opentelemetry.io/contrib/otelconf/v0.3.0"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/log/global"
+	"go.opentelemetry.io/otel/propagation"
 )
 
 func Setup(ctx context.Context, confFlag string) (func(context.Context) error, error) {
@@ -27,6 +28,9 @@ func Setup(ctx context.Context, confFlag string) (func(context.Context) error, e
 	if err != nil {
 		return nil, err
 	}
+
+	otel.SetTextMapPropagator(propagation.NewCompositeTextMapPropagator(propagation.TraceContext{}, propagation.Baggage{}))
+
 	otel.SetTracerProvider(sdk.TracerProvider())
 	otel.SetMeterProvider(sdk.MeterProvider())
 	global.SetLoggerProvider(sdk.LoggerProvider())
