@@ -7,6 +7,7 @@ import (
 	"go.opentelemetry.io/contrib/otelconf/v0.3.0"
 	"go.opentelemetry.io/otel"
 	"go.opentelemetry.io/otel/log/global"
+	"go.opentelemetry.io/otel/metric"
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 )
@@ -42,4 +43,8 @@ func Setup(ctx context.Context, confFlag string) (func(context.Context) error, e
 
 func Tracer() trace.Tracer {
 	return otel.Tracer(Scope)
+}
+
+func Meter() metric.Meter {
+	return otel.Meter(Scope)
 }
