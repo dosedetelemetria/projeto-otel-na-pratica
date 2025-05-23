@@ -39,7 +39,13 @@ func (r *myReceiver) Start(ctx context.Context, host component.Host) error {
 				return
 			case <-r.ticker.C:
 				r.logger.Info("Sending trace")
-				r.next.ConsumeTraces(ctx, ptrace.NewTraces())
+				td := ptrace.NewTraces()
+				rs := td.ResourceSpans().AppendEmpty()
+				ss := rs.ScopeSpans().AppendEmpty()
+				span := ss.Spans().AppendEmpty()
+				span.SetName("criado no receiver")
+				span.Attributes().PutStr("myreceiver", "passou aqui")
+				r.next.ConsumeTraces(ctx, td)
 			}
 		}
 	}()

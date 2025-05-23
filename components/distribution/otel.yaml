@@ -8,6 +8,9 @@ receivers:
       grpc:
       http:
 
+processors:
+  myprocessor:
+
 exporters:
   debug:
     verbosity: detailed
@@ -17,4 +20,5 @@ service:
   pipelines:
     traces:
       receivers: [myreceiver]
+      processors: [myprocessor]
       exporters: [debug]
