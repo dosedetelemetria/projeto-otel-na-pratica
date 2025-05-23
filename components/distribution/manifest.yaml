@@ -14,6 +14,7 @@ exporters:
   - gomod: go.opentelemetry.io/collector/exporter/nopexporter v0.126.0
   - gomod: go.opentelemetry.io/collector/exporter/otlpexporter v0.126.0
   - gomod: go.opentelemetry.io/collector/exporter/otlphttpexporter v0.126.0
+  - gomod: github.com/dosedetelemetria/projeto-otel-na-pratica/exporters/myexporter v0.0.1
 processors:
   - gomod: github.com/dosedetelemetria/projeto-otel-na-pratica/processors/myprocessor v0.0.1
 extensions:
@@ -29,3 +30,4 @@ replaces:
   - github.com/dosedetelemetria/projeto-otel-na-pratica/extensions/myextension => ../../extensions/myextension
   - github.com/dosedetelemetria/projeto-otel-na-pratica/receivers/myreceiver => ../../receivers/myreceiver
   - github.com/dosedetelemetria/projeto-otel-na-pratica/processors/myprocessor => ../../processors/myprocessor
+  - github.com/dosedetelemetria/projeto-otel-na-pratica/exporters/myexporter => ../../exporters/myexporter
