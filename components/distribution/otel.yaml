@@ -1,6 +1,9 @@
 extensions:
   myextension:
 
+connectors:
+  myconnector:
+
 receivers:
   myreceiver:
 
@@ -8,6 +11,8 @@ processors:
   myprocessor:
 
 exporters:
+  debug:
+    verbosity: detailed
   myexporter:
 
 service:
@@ -16,4 +21,7 @@ service:
     traces:
       receivers: [myreceiver]
       processors: [myprocessor]
-      exporters: [myexporter]
+      exporters: [myconnector]
+    logs:
+      receivers: [myconnector]
+      exporters: [debug]
