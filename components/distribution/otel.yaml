@@ -1,0 +1,19 @@
+extensions:
+  myextension:
+
+receivers:
+  otlp:
+    protocols:
+      grpc:
+      http:
+
+exporters:
+  debug:
+    verbosity: detailed
+
+service:
+  extensions: [myextension]
+  pipelines:
+    traces:
+      receivers: [otlp]
+      exporters: [debug]
