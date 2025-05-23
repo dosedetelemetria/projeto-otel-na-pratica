@@ -2,6 +2,7 @@ extensions:
   myextension:
 
 receivers:
+  myreceiver:
   otlp:
     protocols:
       grpc:
@@ -15,5 +16,5 @@ service:
   extensions: [myextension]
   pipelines:
     traces:
-      receivers: [otlp]
+      receivers: [myreceiver]
       exporters: [debug]
